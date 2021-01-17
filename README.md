@@ -45,7 +45,7 @@ The only prerequisite for installing Ethereum ETL is Python 3.5.3 or newer insta
 `pip3 install ethereum-etl`
 by running the following command you can ensure that it was successfully installed and see which version is running:
 `ethereumetl &#x2013;version`
-NB: You might see the following message in the terminal when running ethereumetl: `Symbolic Execution not available: No module named  'mythril.ether'`. This can be ignored. As stated by Evgeny Medvedev in a now closed [issue](https://github.com/blockchain-etl/ethereum-etl/issues/173) about this topic, "You can safely ignore "Symbolic Execution not available" warning. Symbolic execution is not used by ethereum-etl.[...]
+NB: You might see the following message in the terminal when running ethereumetl: `Symbolic Execution not available: No module named  'mythril.ether'`. This can be ignored. As stated by Evgeny Medvedev in a now closed [issue](https://github.com/blockchain-etl/ethereum-etl/issues/173) about this topic, "You can safely ignore "Symbolic Execution not available" warning. Symbolic execution is not used by ethereum-etl.[...]".
 
 
 ### 2.2 Streaming Data to PostgreSQL
