@@ -40,8 +40,10 @@ For the ETL process, Ethereum ETL will be used, which can be found [here](https:
 ### 2.1 Installing Ethereum ETL
 
 The only prerequisite for installing Ethereum ETL is Python 3.5.3 or newer installed on your machine. Then running the following commands will install Ethereum ETL and the streaming mode:
-`pip3 install ethereum-etl`
-`pip3 install ethereum-etl[streaming]`
+```
+pip3 install ethereum-etl
+pip3 install ethereum-etl[streaming]
+```
 
 by running the following command you can ensure that it was successfully installed and see which version is running:
 `ethereumetl --version`
@@ -51,11 +53,18 @@ NB: You might see the following message in the terminal when running ethereumetl
 ### 2.2 Streaming Data to PostgreSQL
 
 In order to stream data into a PostgreSQL database you need to have one setup with the correct Schema in place. For instructions, please read through the section about databases. Once the database is up and running and OpenEthereum is also running, running the following command will start extracting data from the node, transforming it and loading it into the tables of the database:
-**Linux:**
-`ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://[user]:[password]@[IP_Address]:[Port]/[database_name]`
+
+**Linux**
+
+```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://[user]:[password]@[IP_Address]:[Port]/[database_name]```
+
 In my specific case the database is running locally on the default port and it is called etl and belongs to the user postgres with the password postgres. This is the command used:
-`ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://postgres:postgres@127.0.0.1:5432/etl`
-For MacOS the path to the .ipc file will be different, but the rest of the command should stay the same.
+
+```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://postgres:postgres@127.0.0.1:5432/etl```
+
+**MacOS**
+
+The path to the .ipc file will be different, but the rest of the command should stay the same.
 
 The above command tells Ethereum ETL to use the data provided by our local openethereum node, to start syncing from block 0 and to load that data into the postgres database running on localhost on port 5432. By default blocks, transactions, logs and token transfers are extracted, transformed and loaded. By using the `-e` flag followed by any combination of entity names, one extract only the data needed. As of now, only blocks, transactions, traces, token transfers, receipts and logs can be streamed using the stream command. Contract and Token data can only be obtained in a CSV format for now.
 
