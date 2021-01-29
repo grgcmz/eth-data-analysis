@@ -75,10 +75,13 @@ If the command is stopped before finishing or once it has finished, a file calle
 Ethereum ETL needs a specific Database Schema to work properly. By running the create table statements specified in [etl_schema.sql](/scripts/01_etl_schema.sql) in a postgreSQL database, the correct schema for the etl process will be set up.
 
 ### 3.3 Star Schema
-[Star schema](/scripts/02_star_schema.sql)
+- Script for [Star schema](/scripts/02_star_schema.sql)
+- Script for [ETL](/scripts/03_populate_star_schema.sql)
 ![Star schema](/images/star_schema.png)
-[ETL](/scripts/03_populate_star_schema.sql .sql)
+
 ## 4 Querying Data
 [Queries](/scripts/queries.sql)
+
 Result of a test query on a small dataset:
+
 ![Result of test Query](/images/results_query_weekday.png)
