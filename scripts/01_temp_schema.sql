@@ -1,4 +1,4 @@
-CREATE TABLE transaction (
+CREATE TABLE transactions (
   hash                        text primary key,
   nonce                       bigint,
   transaction_index           bigint,
@@ -18,7 +18,7 @@ CREATE TABLE transaction (
   block_hash                  text
 );
 
-CREATE TABLE block (
+CREATE TABLE blocks (
   number            bigint,
   hash              text primary key,
   parent_hash       text,
