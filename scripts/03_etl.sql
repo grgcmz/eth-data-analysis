@@ -64,7 +64,7 @@ SELECT hash,
        block_timestamp,
        block_number,
        block_hash
-  FROM transactions;
+  FROM transaction;
 
 /* Extraction Table Blocks */
 CREATE TABLE IF NOT EXISTS e_d_block
@@ -125,7 +125,7 @@ SELECT number,
        gas_used,
        timestamp,
        transaction_count
-  FROM blocks;
+  FROM block;
 
 
 /* TRANSFORMATION */
