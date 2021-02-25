@@ -9,7 +9,7 @@
 -- Extraction Table Transactions
 
 CREATE TABLE IF NOT EXISTS e_d_transaction (
-    hash                        TEXT,
+    hash                        TEXT PRIMARY KEY,
     nonce                       BIGINT,
     transaction_index           BIGINT,
     from_address                TEXT,
@@ -67,7 +67,7 @@ SELECT hash,
 
 /* Extraction Table Blocks */
 CREATE TABLE IF NOT EXISTS e_d_block (
-    number            BIGINT,
+    number            BIGINT PRIMARY KEY,
     hash              TEXT,
     parent_hash       TEXT,
     nonce             TEXT,
@@ -220,7 +220,6 @@ CREATE TABLE IF NOT EXISTS t_d_block (
 );
 
 TRUNCATE TABLE t_d_block;
-
 INSERT INTO t_d_block (timestamp,
                        number,
                        hash,
@@ -506,7 +505,6 @@ SELECT time,
   FROM t_d_time;
 
 /* Loading account dimension */
-TRUNCATE TABLE d_account;
 INSERT INTO d_account (address,
                        eth_sent,
                        eth_received,
