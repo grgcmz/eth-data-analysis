@@ -8,8 +8,7 @@
 /* EXTRACTION */
 -- Extraction Table Transactions
 
-CREATE TABLE IF NOT EXISTS e_d_transaction
-(
+CREATE TABLE IF NOT EXISTS e_d_transaction (
     hash                        TEXT,
     nonce                       BIGINT,
     transaction_index           BIGINT,
@@ -67,8 +66,7 @@ SELECT hash,
   FROM transactions;
 
 /* Extraction Table Blocks */
-CREATE TABLE IF NOT EXISTS e_d_block
-(
+CREATE TABLE IF NOT EXISTS e_d_block (
     number            BIGINT,
     hash              TEXT,
     parent_hash       TEXT,
@@ -130,8 +128,7 @@ SELECT number,
 
 /* TRANSFORMATION */
 /* Transformation table for transactions */
-CREATE TABLE IF NOT EXISTS t_d_transaction
-(
+CREATE TABLE IF NOT EXISTS t_d_transaction (
     transaction_id              bigserial NOT NULL
         CONSTRAINT pk_t_d_transaction
             PRIMARY KEY,
@@ -177,7 +174,11 @@ SELECT hash,
        nonce,
        transaction_index,
        from_address,
-       to_address,
+       CASE
+           WHEN to_address IS NULL
+           THEN '0x0000000000000000000000000000000000000000' --avoid problems in fact table
+       ELSE to_address
+       END,
        value,
        gas,
        gas_price,
@@ -194,8 +195,7 @@ SELECT hash,
 
 
 /* Transformation table Blocks */
-CREATE TABLE IF NOT EXISTS t_d_block
-(
+CREATE TABLE IF NOT EXISTS t_d_block (
     block_id          bigserial NOT NULL
         CONSTRAINT "pk_t_d_block"
             PRIMARY KEY,
@@ -261,8 +261,7 @@ SELECT timestamp,
   FROM e_d_block;
 
 /* Transformation Table Date */
-CREATE TABLE t_d_date
-(
+CREATE TABLE t_d_date (
     date         DATE NOT NULL
         CONSTRAINT pk_t_d_date
             PRIMARY KEY,
@@ -312,16 +311,86 @@ SELECT distinct block_timestamp::time,
                 extract(second from block_timestamp)
   FROM t_d_transaction;
 
-/* Transformation Table Timestamp
-   This table is not used, but might be useful
-   Would enable to take date and time for those dimensions
-   from this table instead of from transaction table
-*/
-CREATE TABLE t_d_timestamp (
-    timestamp TIMESTAMP(0) NOT NULL
-        CONSTRAINT pk_t_d_timestamp
-            PRIMARY KEY
+/*Account Transformation Tables*/
+CREATE TABLE IF NOT EXISTS t_d_account_from (
+    address TEXT NOT NULL,
+    eth_out NUMERIC(38)
 );
+
+TRUNCATE TABLE t_d_account_from;
+INSERT INTO t_d_account_from (address,
+                              eth_out)
+
+SELECT from_address,
+       eth_out
+
+  FROM (SELECT from_address,
+               (value + gas::NUMERIC(38) * gas_price::NUMERIC(38)) * -1 as eth_out -- Multiply by -1 so that later it gets subtracted from the eth received
+
+          FROM e_d_transaction AS edt) out;
+
+/*case
+           when from_address IS NULL OR from_address = '0x'
+               THEN 'GENESIS OR REWARD'
+           else from_address
+           end, -- STOPPED HERE: do something about genesis and reward to handle it in the select sub query below*/
+/* SELECT from_address,
+        value,
+        (gas_price * gas) AS gas_costs
+        --SUM(value) AS sum_sent,
+        --SUM(gas)   AS sum_gas
+   FROM e_d_transaction
+  GROUP BY from_address) eth_out;*/
+--WHERE from_address != 'GENESIS OR REWARD'
+-- If receipt_contract_address IS NOT NULL -> Deployment of smart contract
+-- from_address is null but tx has eth -> reward or genesis
+
+CREATE TABLE IF NOT EXISTS t_d_account_to (
+    address      TEXT NOT NULL,
+    eth_received NUMERIC(38)
+);
+TRUNCATE TABLE t_d_account_to;
+INSERT INTO t_d_account_to (address,
+                            eth_received)
+SELECT to_address,
+       value
+  FROM e_d_transaction
+ WHERE to_address IS NOT NULL;
+
+
+/*Put from and to together for balances*/
+CREATE TABLE IF NOT EXISTS t_d_account (
+    account_id      BIGSERIAL,
+    address         TEXT
+        CONSTRAINT pk_t_d_account
+            PRIMARY KEY,
+    eth_sent        NUMERIC(38),
+    eth_received    NUMERIC(38),
+    account_balance NUMERIC(38)
+);
+
+TRUNCATE TABLE t_d_account;
+
+INSERT INTO t_d_account (address,
+                         eth_sent,
+                         eth_received,
+                         account_balance)
+SELECT sums.address,
+       SUM(eth_out),
+       SUM(eth) + SUM(eth_out),
+       SUM(eth)
+  FROM (SELECT tdaf.address        AS address,
+               tdaf.eth_out        AS eth,
+               (tdaf.eth_out * -1) AS eth_out -- Reconvert to positive amount
+          FROM t_d_account_from AS tdaf
+
+         UNION ALL
+
+        SELECT tdat.address      as address,
+               tdat.eth_received AS eth,
+               tdat.eth_received AS eth_in -- Just here to match rows for union all
+          FROM t_d_account_to AS tdat) sums
+ GROUP BY address;
 
 
 /* LOADING
@@ -406,13 +475,6 @@ SELECT block_id,
        transaction_count
   FROM t_d_block;
 
-/* Loading timestamp dimension
-   This is not used for now
- */
-/*INSERT INTO d_timestamp (timestamp)
-SELECT timestamp
-FROM t_d_timestamp;*/
-
 /* Loading date dimension */
 
 INSERT INTO d_date (date,
@@ -443,20 +505,37 @@ SELECT time,
        seconds
   FROM t_d_time;
 
-/* Loading blockchain fact table */
+/* Loading account dimension */
+TRUNCATE TABLE d_account;
+INSERT INTO d_account (address,
+                       eth_sent,
+                       eth_received,
+                       account_balance)
+SELECT address,
+       eth_sent,
+       eth_received,
+       account_balance
+  from t_d_account;
 
+/* Loading blockchain fact table */
 INSERT INTO f_blockchain (block_id,
                           transaction_id,
+                          account_from_address,
+                          account_to_address,
                           date,
                           time)
 SELECT tdb.block_id,
        tdt.transaction_id,
+       tdt.from_address,
+       tdt.to_address,
        tdd.date,
        tdti.time
   FROM t_d_transaction AS tdt,
        t_d_block AS tdb,
+       t_d_account AS tda,
        t_d_date as tdd,
        t_d_time as tdti
  WHERE tdt.block_timestamp::date = tdd.date
    AND tdt.block_timestamp::time = tdti.time
-   AND tdt.block_hash = tdb.hash;
+   AND tdt.block_hash = tdb.hash
+   AND tdt.from_address = tda.address;
