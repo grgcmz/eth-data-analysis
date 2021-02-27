@@ -13,6 +13,7 @@ Listed below are the Techincal Details of the Machine this was tested on:
 -   1000GB NVMe SSD
 -   Pop!_OS 20.10 with Kernel 5.8.0-7630-generic
 
+
 ## 1 Setting up an Archive Node
 ### 1.1 Installing OpenEthereum
 
@@ -20,16 +21,23 @@ OpenEthereum can be installed by downloading the binaries provided in the [Relea
 
 ### 1.2 Running OpenEthereum
 
-To have access to all possible information stored in the Ethereum blockchain it is important to run an archive node. This is a very time and resource intensive process that can take up ot several months to complete and use multiple Tera Byte of storage. For the purpose of this proof-of-concept, only a small part of the Etheruem Blockchain was syncronized.
-The command used in testing to start syncronizing with the mains network is the following:
+#### To Archive or not to Archive
+To have all possible information about every transaction on the Ethereum blockchain readily avaialble (without furher computation), it is important to run an archive node. In addition to what is usally stored in a full node, an archive node stores all states in the state-trie, all traces and additional information about accounts. Synchronizing an archive node is a very time and resource intensive process that can take up to several months to complete (for the Main Ethereum Network) and use multiple Tera Bytes of storage. If you are sure to never need the extra data provided by an archive node, you can go ahead and start the node with normal state pruning, no traces and without the fat-db option. Please note that it is not possible to retroactively switch to an archive node from a normal full node, so it is important to evaluate prior to the synchornization what your needs are (and what they are going to be). 
+
+#### Starting the Synchronization process
+For the purpose of this proof-of-concept, only a small part of the Etheruem Blockchain was synchronized. The same concepts can be applied to a much larger dataset. Also note that the archive node in this specific case, is mostly used for future proofing the node. For the time being, all data used can also be obtained using a full node.
+
+The command used in testing to start syncronizing with the main Ethereum Network is the following:
+
 `openethereum mode=active tracing=on pruning=archive fat-db=on no-warp`
-The options specified in the command are not all strictly necessary since some are implied. Listed below are the meanings of each flag that was set in the command:
+
+Listed below are the meanings of each flag that was set in the command:
 
 -   `mode=active`: continuosly syncronize the chain. Can also be set to `offline` if no more syncronization is wished or needed
 -   `tracing=on`: the transaction&rsquo;s execution should be fully traced
 -   `pruning=archive`: keeps the complete state trie and thus ensures highest level of detail
--   `fat-db=on`:
--   `no-warp`: Disables warp mode, which would syncronize starting from a snapshot
+-   `fat-db=on`: Stores metadata about accounts and keys that would otherwise not be stored.
+-   `no-warp`: Disables warp mode, which would otherwise syncronize starting from a snapshot
 
 While OpenEthereum is running, an inter process communication file is created named `jsonrpc.ipc`. By default it is located in `~/.local/share/openethereum/`. This path will later be needed for the ETL process.
 
@@ -55,14 +63,12 @@ NB: You might see the following message in the terminal when running ethereumetl
 In order to stream data into a PostgreSQL database you need to have one setup with the correct Schema in place. For instructions, please read through the section about databases. Once the database is up and running and OpenEthereum is also running, running the following command will start extracting data from the node, transforming it and loading it into the tables of the database:
 
 **Linux**
-
 ```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://[user]:[password]@[IP_Address]:[Port]/[database_name]```
-
 On MacOS the path to the .ipc file will be different, but the rest of the command should stay the same.
 
 In my specific case the database is running locally on the default port and it is called etl and belongs to the user postgres with the password postgres. This is the command used:
 
-```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://postgres:postgres@127.0.0.1:5432/etl```
+```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://postgres:postgres@127.0.0.1:5432/etl -e transaction,block```
 
 The above command tells Ethereum ETL to use the data provided by our local openethereum node, to start syncing from block 0 and to load that data into the postgres database running on localhost on port 5432. By default blocks, transactions, logs and token transfers are extracted, transformed and loaded. By using the `-e` flag followed by any combination of entity names, one can extract only the data needed. As of now, only blocks, transactions, traces, token transfers, receipts and logs can be streamed using the stream command. Contract and Token data can only be obtained in a CSV format for now.
 
@@ -76,7 +82,7 @@ Ethereum ETL needs a specific Database Schema to work properly. By running the c
 
 ### 3.3 Star Schema
 - Script for [Star schema](/scripts/02_star_schema.sql)
-- Script for [ETL](/scripts/03_populate_star_schema.sql)
+- Script for [ETL](/scripts/03_etl.sql)
 ![Star schema](/images/star_schema.png)
 
 ## 4 Querying Data
