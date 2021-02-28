@@ -7,7 +7,7 @@ import helper as h
 def get_user_input():
     h.clear()
     choice = input(
-        "Do you want to generate a database.ini file(y) or not(n)? (DEFAULT: y)"\
+        "Do you want to generate a database.ini file(y) or not(n)? (DEFAULT: y)"
         "Only choose no if you already have one in the current directory\n"
     )
     if choice == "":
@@ -24,7 +24,7 @@ def get_user_input():
         connect_to_db()
 
 
-# Parse connectoin details from database.ini file
+# Parse connection details from database.ini file
 def connection_details(filename='database.ini',
                        section='database_connection_details'):
     parser = ConfigParser()
@@ -65,7 +65,7 @@ def choose(cur):
 def setup_for_extraction(cur):
     try:
         print('Setting up Tables for Ethereum ETL')
-        cur.execute(open("scripts/01_temp_schema.sql", "r").read())
+        cur.execute(open("sql_scripts/01_extraction_tables.sql", "r").read())
         print('done')
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -75,7 +75,7 @@ def setup_for_extraction(cur):
 def setup_star_schema(cur):
     try:
         print('Setting up Star Schema')
-        cur.execute(open("scripts/02_star_schema.sql", "r").read())
+        cur.execute(open("sql_scripts/02_star_schema.sql", "r").read())
         print('done')
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -85,7 +85,7 @@ def setup_star_schema(cur):
 def setup_etl_schema(cur):
     try:
         print('Doing ETL Process')
-        cur.execute(open("scripts/03_etl.sql", "r").read())
+        cur.execute(open("sql_scripts/03_etl.sql", "r").read())
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
@@ -131,3 +131,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# TODO: hyperlink database section in readme section 2.2
+# TODO: hyperlink 2.2 under python3 command
