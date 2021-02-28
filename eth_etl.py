@@ -2,95 +2,46 @@ import subprocess as sp
 import os
 import sys
 from getpass import getpass
+import helper as h
+from etl_postgres import connect_to_db
 
-
+# Get information from user about DB
 def get_user_input():
-    clear()
-    print(
-        "Please note that this tool will write your database password into a local"\
-        "file called database.ini. This file is later used for to create some tables."\
-        "It NEVER leaves your PC, but you might want to opt out if you don't need it"\
-        "or already have one."
-    )
-    choice = input(
-        "\nDo you want to automatically create a database.ini file(y) or not(n)? (DEFAULT: y)\n"
-        or "y"
-    )
-    clear()
-    print("Please type in the information requested about your database and hit ENTER")
-    usn = input("User: ")
-    pswd = getpass()
-    ip_addr = input("IP Address(DEFAULT: localhost): ")
-    if ip_addr == "":
-        ip_addr = "localhost"
-    port = input("Port(DEFAULT: 5432): " or "5432")
-    if port == "":
-        port = "5432"
-    db_name = input("Database name: ")
-    s = input(
-        "Start extracting from specific block number (1) or from last synced block (2)? \n"
-    )
-    if s == "1":
-        start = "--start-block " + input("Start block number: ") + " "
-    else:
-        start = ""
+    return h.get_info(1)
 
-    # If user chooses to opt in
-    # write database.ini file for later use while we are at it
-    if choice == "y":
-        print("Writing database.ini")
-        f = open("database.ini", "w")
-        f.write("[database_connection_details]")
-        f.write("\nhost=" + ip_addr)
-        f.write("\ndatabase=" + db_name)
-        f.write("\nuser=" + usn)
-        f.write("\npassword=" + pswd)
-        f.write("\nport=5432")  # add standard postgres port
-        f.close()
-        print("done")
-
-    # return part of the command with start block and database information
-    return (
-        start
-        + "--output postgresql+pg8000://"
-        + usn
-        + ":"
-        + pswd
-        + "@"
-        + ip_addr
-        + ":"
-        + port
-        + "/"
-        + db_name
-    )
-
-
+# Start Ethereum ETL with the correct command for the DB
 def start_ethetl(command):
     # Pipe output from Ethereum ETL to file
-    with open("ethereum_etl_log.txt", "w") as f:
+    #with open("ethereum_etl_log.txt", "w") as f:
         sp.run(
             [command],
-            shell=True,
-            stdout=f,
-            stderr=f
+            shell=True  # ,
+            # stdout=f,
+            # stderr=f
         )
 
-
-# in windows use cls to clear, all others use clear
-# from stackoverflow answer https://stackoverflow.com/a/2084628 (accessed 27.02.2020)
-def clear():
-    os.system("cls" if os.name == "nt" else "clear")
-
+# Gerenerate the command used for the ethereum etl stream
+def generate_command(input):
+    return (
+        "ethereumetl stream "
+        "--provider-uri FILE://$HOME/.local/share/openethereum/jsonrpc.ipc "
+        "-e transaction,block " + input
+    )
+# Ask the user if he wants to create the tables needed
+def setup_extraction_tables():
+    choice = input (
+        "Do you wish to automatically setup the transactions and blocks table? "\
+        "These tables are required by Ethereum ETL.\n" \
+        "Answer (y)es or (n)o: "
+    )
+    if choice == "y":
+        connect_to_db()
 
 def main():
-    output = get_user_input()
-    command = (
-        "ethereumetl stream \
-                --provider-uri FILE://$HOME/.local/share/openethereum/jsonrpc.ipc \
-                -e transaction,block "
-        + output
-    )
-    print("Starting Ethereum ETL with the following command: {c}", command)
+    input = get_user_input()
+    command = generate_command(input)
+    setup_extraction_tables()
+    print("Starting Ethereum ETL with the following command: ", command)
     print("Output from ETL piped to ethereum_etl_log.txt")
     start_ethetl(command)
 
