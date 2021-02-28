@@ -22,11 +22,11 @@ def start_ethetl(command):
 
 # TODO: take entities from user
 # Generate the command used for the ethereum etl stream
-def generate_command(input):
+def generate_command(user_input):
     return (
             "ethereumetl stream "
             "-e transaction,block "
-            + input
+            + user_input
     )
 
 
@@ -42,8 +42,8 @@ def setup_extraction_tables():
 
 
 def main():
-    input = get_user_input()
-    command = generate_command(input)
+    user_input = get_user_input()
+    command = generate_command(user_input)
     setup_extraction_tables()
     print("Starting Ethereum ETL with the following command: ", command)
     print("Output from ETL piped to ethereum_etl_log.txt")
