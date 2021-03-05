@@ -38,3 +38,27 @@ CREATE TABLE IF NOT EXISTS blocks (
   timestamp         TIMESTAMP,
   transaction_count BIGINT
 );
+
+CREATE TABLE IF NOT EXISTS traces (
+    transaction_hash TEXT,
+    transaction_index bigint,
+    from_address TEXT,
+    to_address TEXT,
+    value numeric(38),
+    input TEXT,
+    output TEXT,
+    trace_type TEXT,
+    call_type TEXT,
+    reward_type TEXT,
+    gas bigint,
+    gas_used bigint,
+    subtraces bigint,
+    trace_address TEXT,
+    error TEXT,
+    status int,
+    block_timestamp TIMESTAMP,
+    block_number BIGINT,
+    block_hash TEXT,
+    trace_id TEXT PRIMARY KEY
+);
+

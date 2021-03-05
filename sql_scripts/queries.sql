@@ -45,9 +45,12 @@ order by date, time;
 SELECT *
   FROM f_blockchain f
            INNER JOIN d_account da
-               on f.account_from_address = da.address
-WHERE date < '2015-08-08'
-ORDER BY account_balance DESC;
+               on f.account_from_address = da.address;
+
+Select *
+FROM d_account;
+Select * from d_block ORDER BY number ;
 
 -- Output Accounts Dimension
 SELECT * FROM d_account;
+Where address = '0x55192e9eef50b024e6800e4657590f33d1070545';

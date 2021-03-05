@@ -328,22 +328,6 @@ SELECT from_address,
 
           FROM e_d_transaction AS edt) out;
 
-/*case
-           when from_address IS NULL OR from_address = '0x'
-               THEN 'GENESIS OR REWARD'
-           else from_address
-           end, -- STOPPED HERE: do something about genesis and reward to handle it in the select sub query below*/
-/* SELECT from_address,
-        value,
-        (gas_price * gas) AS gas_costs
-        --SUM(value) AS sum_sent,
-        --SUM(gas)   AS sum_gas
-   FROM e_d_transaction
-  GROUP BY from_address) eth_out;*/
---WHERE from_address != 'GENESIS OR REWARD'
--- If receipt_contract_address IS NOT NULL -> Deployment of smart contract
--- from_address is null but tx has eth -> reward or genesis
-
 CREATE TABLE IF NOT EXISTS t_d_account_to (
     address      TEXT NOT NULL,
     eth_received NUMERIC(38)

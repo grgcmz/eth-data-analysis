@@ -80,11 +80,10 @@ def setup_star_schema(cur):
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
 
-
 # setup all extraction, transformation and loading tables
 def setup_etl_schema(cur):
     try:
-        print('Doing ETL Process')
+        print('Setting up tables for ETL Process')
         cur.execute(open("sql_scripts/03_etl.sql", "r").read())
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -97,7 +96,6 @@ def setup_all_tables(cur):
     setup_for_extraction(cur)
     setup_star_schema(cur)
     setup_etl_schema(cur)
-
 
 # Connect to the database
 def connect_to_db():
@@ -131,6 +129,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# TODO: hyperlink database section in readme section 2.2
-# TODO: hyperlink 2.2 under python3 command
