@@ -4,3 +4,4 @@ last_synced_block.txt
 database.ini
 __pycache__
 .idea/
+ethereum_etl_command.txt
