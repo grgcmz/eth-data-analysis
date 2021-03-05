@@ -60,21 +60,21 @@ by running the following command you can ensure that it was successfully install
 
 ### 2.2 Streaming Data to PostgreSQL
 
-In order to stream data into a PostgreSQL database you need to have a database setup with the correct Schema in place. This will all be taken care of by a handy python script. For instructions on how to do this manually, please read through the section about databases. Once a database is up and running and OpenEthereum is also syncing, you have two options. You can manually do the rest of the work as described in the next section, or you can use my automation script. Here is a short instruction on how to use the script.
+In order to stream data into a PostgreSQL database you need to have a database setup with the correct Schema in place. This will all be taken care of by a handy python script. For instructions on how to do this manually, please read through the [section about databases](https://github.com/grgcmz/eth-data-analysis/blob/main/README.md#3-postgresql-database). Once a database is up and running and OpenEthereum is also syncing, you have two options. You can manually do the rest of the work as described in the next section, or you can use the automation script. Here is a short instruction on how to use the script.
 
 First start off by cloning this repository and cd into that directory by running the following commands:
 ```bash
 git clone https://github.com/grgcmz/eth-data-analysis.git ~
 cd ~/eth-data-analysis
 ```
-Now run the script using python3. You will be asked if you want to create the database.ini file by answering either yes (y) or no (n) - I suggest you do.
+Now run the script using python3. You will be asked if you want to create the database.ini file by answering either yes (y) or no (n) - I suggest you answer "y" for yes.
 ```bash
 python3 eth_etl.py
 ```
 
-You will then be asked to provide some information about your database, and the location to the IPC file of your running OpenEthereum client (see [this section]() for more information). When asked about from where to start the extraction, choose the first option and enter the block number you would like to start extracting from. If you have run Ethereum ETL before, you might have a last_synced_block.txt file, which you can use by choosing the second option. 
+You will then be asked to provide some information about your database, as well as the location to the IPC file of your running OpenEthereum client (see [this section](https://github.com/grgcmz/eth-data-analysis/blob/main/README.md#starting-the-synchronization-process) for more information). When asked about from where to start the extraction, choose the first option and enter the block number you would like to start extracting from. If you have run Ethereum ETL before, you might have a last_synced_block.txt file, which you can use by choosing the second option. 
 
-This information is then provided to the call to Ethereum ETL. Then, you will be asked if you wish to have the script create the extraction schema for you. Unless you have it already setup, I suggest you answer yes. Choose the first option and hit Enter. If everything goes right, you will see a stream of messages signaling that Ethereum ETL is (probably) working correctly.
+This information is then provided to the call to Ethereum ETL. Then, you will be asked if you wish to have the script create the extraction schema for you. Unless you have it already setup, I suggest you answer yes. Choose the first option and hit Enter. You can also choose to set up all tables, in case you want to have the whole Star-Schema set up. If everything goes right, you will see a stream of messages signaling that Ethereum ETL is (probably) working correctly.
 
 **NB:** The first 50'000 blocks or so do not contain any transactions, so it will take some time (around 10 minutes depending on hardware) before you see data in the transactions table. 
 

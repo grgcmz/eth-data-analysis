@@ -33,38 +33,38 @@ def write_db_file(usn, psd, ip_addr, port, db_name):
 
 # Get DB information and information needed for Ethereum ETL
 def etl_info():
-    clear()
-    print(
-        "Please note that this tool will write your database password into a local"
-        "file called database.ini. This file is later used in the etl python script"
-        "to create some tables. It NEVER leaves your PC, but you might want to opt"
-        "out if you don't need it or already have one."
-    )
     choice = input(
         "\nDo you want to automatically create a database.ini file(y) or not(n)? (DEFAULT: y)\n")
     if choice == "":
         choice = "y"
     clear()
     print("Please type in the requested information about your database and hit ENTER")
-    usn = input("User: ")
+    usn = input("User: ").replace(" ", "")
     psd = getpass()
-    ip_addr = input("IP Address(DEFAULT: localhost): ")
+    ip_addr = input("IP Address(DEFAULT: localhost): ").replace(" ", "")
     if ip_addr == "":
         ip_addr = "localhost"
-    port = input("Port(DEFAULT: 5432): " or "5432")
+    port = input("Port(DEFAULT: 5432): ").replace(" ", "")
     if port == "":
         port = "5432"
-    db_name = input("Database name: ")
-    provider_uri = input("provider_uri (DEFAULT: /$HOME/.local/share/openethereum/jsonrpc.ipc):\n")
+    db_name = input("Database name: ").replace(" ", "")
+    provider_uri = input("provider_uri (DEFAULT: /$HOME/.local/share/openethereum/jsonrpc.ipc):\n").replace(" ", "")
     if provider_uri == "":
         provider_uri = "/$HOME/.local/share/openethereum/jsonrpc.ipc"
     s = input(
         "Start extracting from specific block number (1) or from last synced block (2)? \n"
     )
     if s == "1":
-        start = "--start-block " + input("Start block number: ") + " "
+        start = "--start-block " + input("Start block number: ").replace(" ", "")
     else:
         start = ""
+    entities = input("What entities do you want to extract(comma separated)?\nDEFAULT: transaction, block\nAll: "
+                     "transaction, block, log, token_transfer, trace,token\n").replace(" ", "")
+    if entities == "":
+        entities = "transaction,block"
+
+    extra_options = input("If you have any further options supported by Ethereum ETL you can add the here in the "
+                          "proper format. (DEFAULT: no extra options)\n")
 
     # If user chooses to opt in
     # write database.ini file for later use while we are at it
@@ -77,6 +77,7 @@ def etl_info():
             + provider_uri
             + " "
             + start
+            + " "
             + "--output postgresql+pg8000://"
             + usn
             + ":"
@@ -87,6 +88,10 @@ def etl_info():
             + port
             + "/"
             + db_name
+            + " -e "
+            + entities
+            + " "
+            + extra_options
     )
 
 

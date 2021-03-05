@@ -1,7 +1,7 @@
 import subprocess as sp
 import helper as h
 from etl_postgres import connect_to_db
-
+import sys
 
 # Get information from user about DB
 def get_user_input():
@@ -11,21 +11,19 @@ def get_user_input():
 # Start Ethereum ETL with the correct command for the DB
 def start_ethetl(command):
     # Pipe output from Ethereum ETL to file
-    # with open("ethereum_etl_log.txt", "w") as f:
-    sp.run(
-        [command],
-        shell=True  # ,
-        # stdout=f,
-        # stderr=f
-    )
+    with open("ethereum_etl_log.txt", "w") as f:
+        sp.run(
+            [command],
+            shell=True,
+            stdout=f,
+            stderr=f
+        )
 
 
-# TODO: take entities from user
 # Generate the command used for the ethereum etl stream
 def generate_command(user_input):
     return (
             "ethereumetl stream "
-            "-e transaction,block "
             + user_input
     )
 
@@ -42,13 +40,23 @@ def setup_extraction_tables():
 
 
 def main():
-    user_input = get_user_input()
-    command = generate_command(user_input)
-    setup_extraction_tables()
+    if len(sys.argv) == 1:
+        # h.clear()
+        print(
+            " note that this tool will write your database password into a local"
+            "file called database.ini. This file is later used in the etl python script"
+            "to create some tables. It NEVER leaves your PC, but you might want to opt"
+            "out if you don't need it or already have one."
+        )
+        user_input = get_user_input()
+        command = generate_command(user_input)
+        setup_extraction_tables()
+    else:
+        command = sys.argv[1]
     print("Starting Ethereum ETL with the following command: ", command)
-    print("Output from ETL piped to ethereum_etl_log.txt")
     start_ethetl(command)
 
 
 if __name__ == "__main__":
+    print(str(sys.argv))
     main()
