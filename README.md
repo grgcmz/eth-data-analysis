@@ -1,4 +1,5 @@
-# ETH Data Analysis
+# ETH RDS
+A Relational Database Schema for the Ethereum Blockchain
 
 ## General Information
 This is a step-by-step instruction on how to
