@@ -1,6 +1,7 @@
 /*SQL Statements to create the Star Schema
 
 Transaction Dimension*/
+BEGIN;
 CREATE TABLE d_transaction (
     transaction_id              BIGSERIAL NOT NULL
         CONSTRAINT pk_d_transaction
@@ -108,3 +109,4 @@ CREATE TABLE f_blockchain (
             REFERENCES d_time
 );
 
+COMMIT;

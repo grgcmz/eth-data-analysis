@@ -38,8 +38,7 @@ CREATE TABLE IF NOT EXISTS blocks (
   timestamp         TIMESTAMP,
   transaction_count BIGINT
 );
-
-CREATE TABLE IF NOT EXISTS traces (
+/*CREATE TABLE IF NOT EXISTS traces (
     transaction_hash TEXT,
     transaction_index bigint,
     from_address TEXT,
@@ -61,4 +60,4 @@ CREATE TABLE IF NOT EXISTS traces (
     block_hash TEXT,
     trace_id TEXT PRIMARY KEY
 );
-
+*/
