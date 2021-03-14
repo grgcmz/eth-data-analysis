@@ -1,7 +1,9 @@
 import subprocess as sp
-import helper as h
-from etl_postgres import connect_to_db
 import sys
+
+import utils.helper as h
+from etl_postgres import choose
+
 
 # Get information from user about DB
 def get_user_input():
@@ -36,7 +38,7 @@ def setup_extraction_tables():
         "Answer (y)es or (n)o: "
     )
     if choice == "y":
-        connect_to_db()
+        choose()
 
 
 def main():

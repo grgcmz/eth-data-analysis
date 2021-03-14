@@ -1,3 +1,8 @@
+/* SQL statements to create transactions and blocks tables if they don't already exist.
+These Tables are needed for Ethereum ETL to work correctly. They are the extraction location
+where all transaction and block data goes into right after having been exported.
+The Tables are then truncated before each new extraction.
+*/
 CREATE TABLE IF NOT EXISTS transactions (
   hash                        TEXT PRIMARY KEY,
   nonce                       BIGINT,
@@ -17,6 +22,8 @@ CREATE TABLE IF NOT EXISTS transactions (
   block_number                BIGINT,
   block_hash                  TEXT
 );
+
+TRUNCATE TABLE transactions;
 
 CREATE TABLE IF NOT EXISTS blocks (
   number            BIGINT,
@@ -38,26 +45,5 @@ CREATE TABLE IF NOT EXISTS blocks (
   timestamp         TIMESTAMP,
   transaction_count BIGINT
 );
-/*CREATE TABLE IF NOT EXISTS traces (
-    transaction_hash TEXT,
-    transaction_index bigint,
-    from_address TEXT,
-    to_address TEXT,
-    value numeric(38),
-    input TEXT,
-    output TEXT,
-    trace_type TEXT,
-    call_type TEXT,
-    reward_type TEXT,
-    gas bigint,
-    gas_used bigint,
-    subtraces bigint,
-    trace_address TEXT,
-    error TEXT,
-    status int,
-    block_timestamp TIMESTAMP,
-    block_number BIGINT,
-    block_hash TEXT,
-    trace_id TEXT PRIMARY KEY
-);
-*/
+
+TRUNCATE TABLE blocks;

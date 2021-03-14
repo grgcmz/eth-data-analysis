@@ -1,8 +1,9 @@
-/*SQL Statements to create the Star Schema
-
-Transaction Dimension*/
+/* SQL Statements to create the Star Schema for the Data Warehouse. It will only
+get filled after the ETL process.
+*/
+/* Transaction Dimension */
 BEGIN;
-CREATE TABLE d_transaction (
+CREATE TABLE IF NOT EXISTS d_transaction (
     transaction_id              BIGSERIAL NOT NULL
         CONSTRAINT pk_d_transaction
             PRIMARY KEY,
@@ -26,7 +27,7 @@ CREATE TABLE d_transaction (
 );
 
 /* Block Dimension*/
-CREATE TABLE d_block (
+CREATE TABLE IF NOT EXISTS d_block (
     block_id          BIGSERIAL NOT NULL
         CONSTRAINT pk_d_block
             PRIMARY KEY,
@@ -52,7 +53,7 @@ CREATE TABLE d_block (
 
 
 /*Date Dimension*/
-CREATE TABLE d_date (
+CREATE TABLE IF NOT EXISTS d_date (
     date         DATE NOT NULL
         CONSTRAINT pk_d_date
             PRIMARY KEY,
@@ -65,7 +66,7 @@ CREATE TABLE d_date (
 );
 
 /*Time Dimension*/
-CREATE TABLE d_time (
+CREATE TABLE IF NOT EXISTS d_time (
     time    TIME NOT NULL
         CONSTRAINT pk_d_time
             PRIMARY KEY,
@@ -75,7 +76,7 @@ CREATE TABLE d_time (
 );
 
 /*Account Dimension*/
-CREATE TABLE d_account (
+CREATE TABLE IF NOT EXISTS d_account (
     account_id      BIGSERIAL NOT NULL,
     address         TEXT
         CONSTRAINT pk_d_account
@@ -86,7 +87,7 @@ CREATE TABLE d_account (
 );
 
 /*Fact Table*/
-CREATE TABLE f_blockchain (
+CREATE TABLE IF NOT EXISTS f_blockchain (
     CONSTRAINT pk_f_blockchain
         PRIMARY KEY (block_id, transaction_id, account_from_address, account_to_address, date, time),
     block_id             BIGINT NOT NULL

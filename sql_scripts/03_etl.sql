@@ -9,7 +9,6 @@
 /* Extraction Table Transactions */
 BEGIN;
 CREATE TABLE IF NOT EXISTS e_d_transaction (
-    hash                        TEXT PRIMARY KEY,
     nonce                       BIGINT,
     transaction_index           BIGINT,
     from_address                TEXT,
@@ -27,6 +26,11 @@ CREATE TABLE IF NOT EXISTS e_d_transaction (
     block_number                BIGINT,
     block_hash                  TEXT
 );
+
+-- Truncate both the e_d_transaction table and the transaction table
+-- to only transform and load new data
+TRUNCATE TABLE e_d_transaction;
+TRUNCATE TABLE transactions;
 
 INSERT INTO e_d_transaction (hash,
                              nonce,
@@ -64,10 +68,8 @@ SELECT hash,
        block_number,
        block_hash
   FROM transactions;
-COMMIT;
 
 /* Extraction Table Blocks */
-BEGIN;
 CREATE TABLE IF NOT EXISTS e_d_block (
     number            BIGINT PRIMARY KEY,
     hash              TEXT,
@@ -88,6 +90,8 @@ CREATE TABLE IF NOT EXISTS e_d_block (
     timestamp         TIMESTAMP(0),
     transaction_count BIGINT
 );
+
+TRUNCATE TABLE e_d_block;
 
 INSERT INTO e_d_block (number,
                        hash,
@@ -126,11 +130,9 @@ SELECT number,
        timestamp,
        transaction_count
   FROM blocks;
-COMMIT;
 
 /* TRANSFORMATION */
 /* Transformation table for transactions */
-BEGIN;
 CREATE TABLE IF NOT EXISTS t_d_transaction (
     transaction_id              bigserial NOT NULL
         CONSTRAINT pk_t_d_transaction
@@ -195,10 +197,8 @@ SELECT hash,
        block_number,
        block_hash
   FROM e_d_transaction;
-COMMIT;
 
 /* Transformation table Blocks */
-BEGIN;
 CREATE TABLE IF NOT EXISTS t_d_block (
     block_id          bigserial NOT NULL
         CONSTRAINT "pk_t_d_block"
@@ -224,6 +224,7 @@ CREATE TABLE IF NOT EXISTS t_d_block (
 );
 
 TRUNCATE TABLE t_d_block;
+
 INSERT INTO t_d_block (timestamp,
                        number,
                        hash,
@@ -262,10 +263,8 @@ SELECT timestamp,
        gas_used,
        transaction_count
   FROM e_d_block;
-COMMIT;
 
 /* Transformation Table Date */
-BEGIN;
 CREATE TABLE t_d_date (
     date         DATE NOT NULL
         CONSTRAINT pk_t_d_date
@@ -277,6 +276,7 @@ CREATE TABLE t_d_date (
     day_in_chars TEXT,
     week         INTEGER
 );
+
 TRUNCATE TABLE t_d_date;
 
 INSERT INTO t_d_date (date,
@@ -295,10 +295,8 @@ SELECT distinct block_timestamp::date,
                 to_char(block_timestamp, 'Day'),
                 extract(week from block_timestamp)
   FROM t_d_transaction;
-COMMIT;
 
 /* Transformation Table Time */
-BEGIN;
 CREATE TABLE t_d_time (
     time    TIME NOT NULL
         CONSTRAINT pk_t_d_time
@@ -307,6 +305,7 @@ CREATE TABLE t_d_time (
     minutes INTEGER,
     seconds INTEGER
 );
+
 TRUNCATE TABLE t_d_time;
 
 INSERT INTO t_d_time(time,
@@ -319,16 +318,15 @@ SELECT distinct block_timestamp::time,
                 extract(minute from block_timestamp),
                 extract(second from block_timestamp)
   FROM t_d_transaction;
-COMMIT;
 
 /* Account Transformation Tables */
-BEGIN;
 CREATE TABLE IF NOT EXISTS t_d_account_from (
     address TEXT NOT NULL,
     eth_out NUMERIC(38)
 );
 
 TRUNCATE TABLE t_d_account_from;
+
 INSERT INTO t_d_account_from (address,
                               eth_out)
 
@@ -352,10 +350,8 @@ SELECT to_address,
        value
   FROM e_d_transaction
  WHERE to_address IS NOT NULL;
-COMMIT;
 
 /*Put from and to together for balances*/
-BEGIN;
 CREATE TABLE IF NOT EXISTS t_d_account (
     account_id      BIGSERIAL,
     address         TEXT
@@ -388,11 +384,9 @@ SELECT sums.address,
                tdat.eth_received AS eth_in -- Just here to match rows for union all
           FROM t_d_account_to AS tdat) sums
  GROUP BY address;
-COMMIT;
 
 /* LOADING */
 /* Loading transaction dimension */
-BEGIN;
 INSERT INTO d_transaction(transaction_id,
                           hash,
                           nonce,
@@ -473,7 +467,6 @@ SELECT block_id,
   FROM t_d_block;
 
 /* Loading date dimension */
-
 INSERT INTO d_date (date,
                     year,
                     month,
