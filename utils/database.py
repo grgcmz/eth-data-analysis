@@ -1,8 +1,8 @@
 import psycopg2
 from configparser import ConfigParser
-import helper as h
 
-def connection_details(filename='../database.ini',
+
+def connection_details(filename='./../eth-data-analysis/database.ini',
                        section='database_connection_details'):
     parser = ConfigParser()
     parser.read(filename)
@@ -17,6 +17,7 @@ def connection_details(filename='../database.ini',
 
     return db
 
+
 # Connect to the database
 def connect_to_db():
     con = None
@@ -26,9 +27,12 @@ def connect_to_db():
         con = psycopg2.connect(**connection_details())
         # creating a cursor
         cur = con.cursor()
-        return con,cur
+        print(cur)
+        print(con)
+        return con, cur
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+
 
 def disconnect_from_db(con, cur):
     try:

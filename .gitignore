@@ -1,5 +1,4 @@
 .vscode/
-ethereum_etl_log.txt
 last_synced_block.txt
 database.ini
 __pycache__

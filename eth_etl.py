@@ -5,15 +5,10 @@ import utils.helper as h
 from etl_postgres import choose
 
 
-# Get information from user about DB
-def get_user_input():
-    return h.get_info(1)
-
-
 # Start Ethereum ETL with the correct command for the DB
 def start_ethetl(command):
     # Write Command to file for later use
-    f = open("ethereum_etl_command.txt","w")
+    f = open("ethereum_etl_command.txt", "w")
     f.write(command)
     f.close()
 
@@ -21,6 +16,18 @@ def start_ethetl(command):
         [command],
         shell=True
     )
+
+
+# Set up tables if they dont exist yet and truncate them if they do exist
+def set_up_tables():
+    choose()
+
+
+# Just a little step more to print correct instructions for this script
+def setup_extraction_tables():
+    print("If you have not extracted any data yet, it is recommended to choose option 1.\n")
+    set_up_tables()
+
 
 # Generate the command used for the ethereum etl stream
 def generate_command(user_input):
@@ -30,22 +37,17 @@ def generate_command(user_input):
     )
 
 
-# Ask the user if he wants to create the tables needed
-def setup_extraction_tables():
-    choice = input(
-        "Do you wish to automatically setup the transactions and blocks table? "
-        "These tables are required by Ethereum ETL.\n"
-        "Answer (y)es or (n)o: "
-    )
-    if choice == "y":
-        choose()
+# Get information from user about DB
+def get_user_input():
+    return h.get_info(1)
 
 
 def main():
+    # If no arguments are provided to command, ask user for input
     if len(sys.argv) == 1:
         h.clear()
         print(
-            " note that this tool will write your database password into a local"
+            "Note that this tool will write your database password into a local"
             "file called database.ini. This file is later used in the etl python script"
             "to create some tables. It NEVER leaves your PC, but you might want to opt"
             "out if you don't need it or already have one."
@@ -53,11 +55,19 @@ def main():
         user_input = get_user_input()
         command = generate_command(user_input)
         setup_extraction_tables()
-    else:
+    else:  # The user can also run the script directly providing the command for ethereum etl
         h.clear()
         command = sys.argv[1]
-    print("Starting Ethereum ETL with the following command: ", command)
-    start_ethetl(command)
+    try:
+        print("Starting Ethereum ETL with the following command: ", command)
+        start_ethetl(command)
+    except KeyboardInterrupt:
+        t = open("last_synced_block.txt", "r")
+        print("Last synced block: ", t.read())
+        t.close()
+        print("Terminating...")
+        print("done")
+        sys.exit()
 
 
 if __name__ == "__main__":
