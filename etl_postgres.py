@@ -7,33 +7,37 @@ import utils.database as d
 # setup transaction and block table as per Ethereum ETL schema
 def setup_for_extraction(cur):
     try:
-        print('Setting up Tables for Ethereum ETL')
+        print("Setting up Tables for Ethereum ETL")
         cur.execute(open("sql_scripts/01_extraction_tables.sql", "r").read())
-        print('done')
+        print("done")
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    finally:
+        choose()
 
 
 # Setup final star schema
 def setup_star_schema(cur):
     try:
-        print('Setting up Star Schema')
+        print("\nSetting up Star Schema")
         cur.execute(open("sql_scripts/02_star_schema.sql", "r").read())
-        print('done')
+        print("done")
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
+    finally:
+        choose()
 
 
 # setup all extraction, transformation and loading tables
 def setup_etl_schema(cur):
     try:
-        print('Setting up tables for ETL Process')
+        print("\nSetting up tables for ETL Process")
         cur.execute(open("sql_scripts/03_etl.sql", "r").read())
+        print("done")
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
-
-    print('done')
-
+    finally:
+        choose()
 
 # Setup all tables
 def setup_all_tables(cur):
@@ -56,8 +60,13 @@ def choose(dbcon=None):
     print("Choose which tables to create...")
     choice = int(
         input(
-            "1. Table for Ethereum ETL\n2. Star Schema\n3. ETL Tables\n4. All Tables\n"
-        ))
+            "1. Table for Ethereum ETL\n"
+            "2. Star Schema\n"
+            "3. ETL Tables\n"
+            "4. All Tables\n"
+            "5. Commit and Quit\n"
+        )
+    )
     try:
         if choice == 1:
             setup_for_extraction(cur)
@@ -67,14 +76,14 @@ def choose(dbcon=None):
             setup_etl_schema(cur)
         elif choice == 4:
             setup_all_tables(cur)
+        elif choice == 5:
+            print("Quitting...")
         else:
             choose(dbcon)
     finally:
         close_connection(con, cur)
 
-    # return dbcon
-
-
+# Get some input from the user
 def get_user_input():
     h.clear()
     choice = input(
@@ -90,10 +99,8 @@ def get_user_input():
             print("Something went wrong")
         finally:
             choose()
-            # close_connection(con, cur)
     else:
         choose()
-        # close_connection(con, cur)
 
 
 def main():
