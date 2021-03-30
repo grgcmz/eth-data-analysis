@@ -1,4 +1,4 @@
-# ETH RDS
+# ETH Data Analysis
 A Relational Database Schema for the Ethereum Blockchain 
 
 ## General Information
@@ -23,7 +23,7 @@ OpenEthereum can be installed by downloading the binaries provided in the [Relea
 ### 1.2 Running OpenEthereum
 
 #### 1.2.1 To Archive or not to Archive
-To have all possible information about every transaction on the Ethereum blockchain readily available (without the need for further computation), it is important to run an archive node. In addition to what is usually stored in a full node, an archive node stores all states in the state-trie, all traces and additional information about accounts ([click here](https://docs.ethhub.io/using-ethereum/running-an-ethereum-node/) for more information). This mean that e.g., it is possible to query the balance of any account at any point in time. Synchronizing an archive node is a very time and resource intensive process that can take up to several months to complete (for the Main Ethereum Network) and use multiple Tera Bytes of storage. If you are sure to never need the extra data provided by an archive node, you can go ahead and start the node with normal state pruning, no traces and without the fat-db option. Please note that it is not possible to retroactively switch to an archive node from a normal full node, so it is important to evaluate prior to the synchronization what your needs are (and what they are going to be).
+To have all possible information about every transaction on the Ethereum blockchain readily available (without the need for further computation), it is important to run an archive node. In addition to what is usually stored in a full node, an archive node stores all states in the state-trie, all traces and additional information about accounts ([click here](https://docs.ethhub.io/using-ethereum/running-an-ethereum-node/) for more information). This mean that e.g., it is possible to query the balance of any account at any point in time. Synchronizing an archive node is a very time and resource intensive process that can take up to several months to complete (for the Main Ethereum Network) and use multiple Terabytes of storage. If you are sure to never need the extra data provided by an archive node, you can go ahead and start the node with normal state pruning, no traces and without the fat-db option. Please note that it is not possible to retroactively switch to an archive node from a normal full node, so it is important to evaluate prior to the synchronization what your needs are (and what they are going to be).
 
 #### 1.2.2 Starting the Synchronization process
 For the purpose of this proof-of-concept, only a small part of the Ethereum Blockchain was synchronized. The same concepts can be applied to a much larger dataset. Also note that the archive node in this specific case, is mostly used for future proofing the node. For the time being, all data used can also be obtained using a full node.
