@@ -39,18 +39,16 @@ SELECT weekday,
 -- Output Fact Table
 SELECT *
   FROM f_blockchain
-order by date, time;
+ order by date, time;
 
--- Output Accounts and their balances (Descending order) after the first day of Ethereum being active
+-- Output Accounts and their balances (descending order)
 SELECT *
   FROM f_blockchain f
            INNER JOIN d_account da
-               on f.account_from_address = da.address;
+                      on f.account_from_address = da.address;
 
 Select *
-FROM d_account;
-Select * from d_block ORDER BY number ;
-
--- Output Accounts Dimension
-SELECT * FROM d_account;
-Where address = '0x55192e9eef50b024e6800e4657590f33d1070545';
+  FROM d_account;
+Select *
+  from d_block
+ ORDER BY number;

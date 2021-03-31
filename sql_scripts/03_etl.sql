@@ -1,6 +1,6 @@
 /*  ETL
     Prerequisites:
-        - Transaction and Block Table have been populated with
+        - Transactions and blocks table have been populated with
           data using Ethereum ETL
         - Star schema has been set up using star_schema.sql
 */
@@ -8,8 +8,7 @@
 /* EXTRACTION */
 /* Extraction Table Transactions */
 BEGIN;
-CREATE TABLE IF NOT EXISTS e_d_transaction
-(
+CREATE TABLE IF NOT EXISTS e_d_transaction (
     hash                        TEXT,
     nonce                       BIGINT,
     transaction_index           BIGINT,
@@ -66,11 +65,10 @@ SELECT hash,
        block_timestamp,
        block_number,
        block_hash
-FROM transactions;
+  FROM transactions;
 
 /* Extraction Table Blocks */
-CREATE TABLE IF NOT EXISTS e_d_block
-(
+CREATE TABLE IF NOT EXISTS e_d_block (
     number            BIGINT PRIMARY KEY,
     hash              TEXT,
     parent_hash       TEXT,
@@ -129,13 +127,12 @@ SELECT number,
        gas_used,
        timestamp,
        transaction_count
-FROM blocks;
+  FROM blocks;
 
 /* TRANSFORMATION */
 /* Transformation table for transactions */
-CREATE TABLE IF NOT EXISTS t_d_transaction
-(
-    transaction_id              bigserial NOT NULL
+CREATE TABLE IF NOT EXISTS t_d_transaction (
+    transaction_id              BIGSERIAL NOT NULL
         CONSTRAINT pk_t_d_transaction
             PRIMARY KEY,
     hash                        TEXT,
@@ -197,15 +194,14 @@ SELECT hash,
        block_timestamp,
        block_number,
        block_hash
-FROM e_d_transaction;
+  FROM e_d_transaction;
 
 /* Transformation table Blocks */
-CREATE TABLE IF NOT EXISTS t_d_block
-(
-    block_id          bigserial NOT NULL
+CREATE TABLE IF NOT EXISTS t_d_block (
+    block_id          BIGSERIAL NOT NULL
         CONSTRAINT "pk_t_d_block"
             PRIMARY KEY,
-    timestamp         timestamp(0),
+    timestamp         TIMESTAMP(0),
     number            BIGINT,
     hash              TEXT,
     parent_hash       TEXT,
@@ -264,11 +260,10 @@ SELECT timestamp,
        gas_limit,
        gas_used,
        transaction_count
-FROM e_d_block;
+  FROM e_d_block;
 
 /* Transformation Table Date */
-CREATE TABLE IF NOT EXISTS t_d_date
-(
+CREATE TABLE IF NOT EXISTS t_d_date (
     date         DATE NOT NULL
         CONSTRAINT pk_t_d_date
             PRIMARY KEY,
@@ -297,11 +292,10 @@ SELECT distinct block_timestamp::date,
                 extract(isodow from block_timestamp),
                 to_char(block_timestamp, 'Day'),
                 extract(week from block_timestamp)
-FROM t_d_transaction;
+  FROM t_d_transaction;
 
 /* Transformation Table Time */
-CREATE TABLE IF NOT EXISTS t_d_time
-(
+CREATE TABLE IF NOT EXISTS t_d_time (
     time    TIME NOT NULL
         CONSTRAINT pk_t_d_time
             PRIMARY KEY,
@@ -321,11 +315,10 @@ SELECT distinct block_timestamp::time,
                 extract(hour from block_timestamp),
                 extract(minute from block_timestamp),
                 extract(second from block_timestamp)
-FROM t_d_transaction;
+  FROM t_d_transaction;
 
 /* Account Transformation Tables */
-CREATE TABLE IF NOT EXISTS t_d_account_from
-(
+CREATE TABLE IF NOT EXISTS t_d_account_from (
     address TEXT NOT NULL,
     eth_out NUMERIC(38)
 );
@@ -338,13 +331,13 @@ INSERT INTO t_d_account_from (address,
 SELECT from_address,
        eth_out
 
-FROM (SELECT from_address,
-             (value + gas::NUMERIC(38) * gas_price::NUMERIC(38)) * -1 as eth_out -- Multiply by -1 so that later it gets subtracted from the eth received
+  FROM (SELECT from_address,
+               (value + receipt_gas_used::NUMERIC(38) * gas_price::NUMERIC(38)) *
+               -1 as eth_out -- Multiply by -1 so that later it gets subtracted from the eth received
 
-      FROM e_d_transaction AS edt) out;
+          FROM e_d_transaction AS edt) out;
 
-CREATE TABLE IF NOT EXISTS t_d_account_to
-(
+CREATE TABLE IF NOT EXISTS t_d_account_to (
     address      TEXT NOT NULL,
     eth_received NUMERIC(38)
 );
@@ -354,12 +347,11 @@ INSERT INTO t_d_account_to (address,
                             eth_received)
 SELECT to_address,
        value
-FROM e_d_transaction
-WHERE to_address IS NOT NULL;
+  FROM e_d_transaction
+ WHERE to_address IS NOT NULL;
 
 /*Put from and to together for balances*/
-CREATE TABLE IF NOT EXISTS t_d_account
-(
+CREATE TABLE IF NOT EXISTS t_d_account (
     account_id      BIGSERIAL,
     address         TEXT
         CONSTRAINT pk_t_d_account
@@ -379,18 +371,18 @@ SELECT sums.address,
        SUM(eth_out),
        SUM(eth) + SUM(eth_out),
        SUM(eth)
-FROM (SELECT tdaf.address        AS address,
-             tdaf.eth_out        AS eth,
-             (tdaf.eth_out * -1) AS eth_out -- Reconvert to positive amount
-      FROM t_d_account_from AS tdaf
+  FROM (SELECT tdaf.address        AS address,
+               tdaf.eth_out        AS eth,
+               (tdaf.eth_out * -1) AS eth_out -- Reconvert to positive amount
+          FROM t_d_account_from AS tdaf
 
-      UNION ALL
+         UNION ALL
 
-      SELECT tdat.address      as address,
-             tdat.eth_received AS eth,
-             tdat.eth_received AS eth_in -- Just here to match rows for union all
-      FROM t_d_account_to AS tdat) sums
-GROUP BY address;
+        SELECT tdat.address      as address,
+               tdat.eth_received AS eth,
+               tdat.eth_received AS eth_in -- Just here to match rows for union all
+          FROM t_d_account_to AS tdat) sums
+ GROUP BY address;
 
 /* LOADING */
 /* Loading transaction dimension */
@@ -430,7 +422,7 @@ SELECT transaction_id,
        block_timestamp,
        block_number,
        block_hash
-FROM t_d_transaction;
+  FROM t_d_transaction;
 
 /* Loading block dimension */
 INSERT INTO d_block (block_id,
@@ -471,7 +463,7 @@ SELECT block_id,
        gas_limit,
        gas_used,
        transaction_count
-FROM t_d_block;
+  FROM t_d_block;
 
 /* Loading date dimension */
 INSERT INTO d_date (date,
@@ -488,8 +480,8 @@ SELECT date,
        weekday,
        day_in_chars,
        week
-FROM t_d_date
-ON CONFLICT DO NOTHING;
+  FROM t_d_date
+    ON CONFLICT DO NOTHING;
 -- Avoid conflicts with duplicate dates
 
 /* Loading time dimension */
@@ -502,8 +494,8 @@ SELECT time,
        hours,
        minutes,
        seconds
-FROM t_d_time
-ON CONFLICT DO NOTHING;
+  FROM t_d_time
+    ON CONFLICT DO NOTHING;
 -- Avoid conflicts with duplicate timestamps
 
 /* Loading account dimension */
@@ -515,8 +507,12 @@ SELECT address,
        eth_sent,
        eth_received,
        account_balance
-FROM t_d_account
-ON CONFLICT DO NOTHING;
+  FROM t_d_account
+-- On conflict add the changes to the account balances
+    ON CONFLICT (address) DO UPDATE
+        SET eth_sent        = d_account.eth_sent + EXCLUDED.eth_sent,
+            eth_received    = d_account.eth_received + EXCLUDED.eth_received,
+            account_balance = d_account.account_balance + EXCLUDED.account_balance;
 
 
 /* Loading blockchain fact table */
@@ -532,13 +528,13 @@ SELECT tdb.block_id,
        tdt.to_address,
        tdd.date,
        tdti.time
-FROM t_d_transaction AS tdt,
-     t_d_block AS tdb,
-     t_d_account AS tda,
-     t_d_date as tdd,
-     t_d_time as tdti
-WHERE tdt.block_timestamp::date = tdd.date
-  AND tdt.block_timestamp::time = tdti.time
-  AND tdt.block_hash = tdb.hash
-  AND tdt.from_address = tda.address;
+  FROM t_d_transaction AS tdt,
+       t_d_block AS tdb,
+       t_d_account AS tda,
+       t_d_date AS tdd,
+       t_d_time AS tdti
+ WHERE tdt.block_timestamp::date = tdd.date
+   AND tdt.block_timestamp::time = tdti.time
+   AND tdt.block_hash = tdb.hash
+   AND tdt.from_address = tda.address;
 COMMIT;
