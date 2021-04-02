@@ -1,6 +1,11 @@
 import psycopg2
 from configparser import ConfigParser
 
+# For the following functions, the official configparser docs as well
+# as the officila psycopg2 docs were used for reference.
+# Configparser: https://docs.python.org/3/library/configparser.html
+# Psycopg2: https://www.psycopg.org/docs/
+
 
 def connection_details(filename='./../eth-data-analysis/database.ini',
                        section='database_connection_details'):

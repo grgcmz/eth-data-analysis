@@ -4,6 +4,13 @@ import sys
 import utils.helper as h
 from etl_postgres import choose
 
+# Author: Giorgio Camozzi
+# This script is a wrapper around Ethereum ETL. It requests
+# some user input before calling Ethereum ETL with that input.
+# Ethereum ETL was NOT created by me. You find more
+# information about Ethereum ETL here:
+# https://github.com/blockchain-etl/ethereum-etl
+
 
 # Start Ethereum ETL with the correct command for the DB
 def start_ethetl(command):
@@ -25,7 +32,7 @@ def set_up_tables():
 
 # Just a little step more to print correct instructions for this script
 def setup_extraction_tables():
-    print("If you have not extracted any data yet, it is recommended to choose option 1.\n")
+    print("Please choose option 1.\n")
     set_up_tables()
 
 

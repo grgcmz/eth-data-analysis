@@ -3,6 +3,9 @@ import psycopg2
 import utils.helper as h
 import utils.database as d
 
+# This script helps in setting up different tables used for an analysis of
+# the Ethereum blockchain.
+
 
 # setup transaction and block table as per Ethereum ETL schema
 def setup_for_extraction(cur):
@@ -38,6 +41,7 @@ def setup_etl_schema(cur):
         print(error)
     finally:
         choose()
+
 
 # Setup all tables
 def setup_all_tables(cur):
@@ -83,12 +87,14 @@ def choose(dbcon=None):
     finally:
         close_connection(con, cur)
 
+
 # Get some input from the user
 def get_user_input():
     h.clear()
     choice = input(
-        "Do you want to generate a database.ini file(y) or not(n)? (DEFAULT: y)\n"
-        "Only choose no if you already have one in the current directory\n")
+        "Do you want to generate a database.ini file(y) or not(n)?\n"
+        "Only choose no if you already have one in the current directory\n"
+        "(DEFAULT: y)\n")
     if choice == "":
         choice = "y"
 
