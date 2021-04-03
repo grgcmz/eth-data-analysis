@@ -1,11 +1,12 @@
 # ETH Data Analysis
-A Relational Database Schema for the Ethereum Blockchain 
+Python scripts to set up a multidimensional model for Ethereuem data analysis.
 
 ## General Information
 This is a step-by-step guide on how to
 1.  set up an OpenEthereum (formerly known as Parity) archive node
-2.  extract, transform and load block and transaction data to a PostgreSQL database using [Ethereum ETL](https://github.com/blockchain-etl/ethereum-etl)
-3.  query the data
+2.  extract block and transaction data to a PostgreSQL database using [Ethereum ETL](https://github.com/blockchain-etl/ethereum-etl)
+3.  transform and load the data into a star schema
+4.  query the data
 
 Listed below are the Technical Details of the Machine this was tested on:
 -   Thinkpad T14 Gen 1
