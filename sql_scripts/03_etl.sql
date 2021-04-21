@@ -285,8 +285,9 @@ INSERT INTO t_d_date (date,
                       day_in_chars,
                       week)
 
+-- https://www.postgresql.org/docs/9.1/functions-datetime.html
 SELECT distinct block_timestamp::date,
-                extract(year from block_timestamp),
+                extract(isoyear from block_timestamp), -- use isoyear to avid problems with early jan dates
                 extract(month from block_timestamp),
                 extract(day from block_timestamp),
                 extract(isodow from block_timestamp),
