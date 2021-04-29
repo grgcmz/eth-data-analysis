@@ -37,8 +37,12 @@ The Ethereum client OpenEthereum must also be installed. Binaries are provided i
 #### 1.2.1 To Archive or not to Archive
 To have all possible information about every transaction on the Ethereum blockchain readily available (without the need for further computation), it is important to run an archive node. In addition to what is usually stored in a full node, an archive node stores all states in the state-trie, all traces and additional information about accounts ([click here](https://ethereum.org/en/developers/docs/nodes-and-clients/) for more information). This means that e.g., it is possible to query the balance of any account at any point in time. Synchronizing an archive node is a very time and resource intensive process that can take up to several months to complete (for the Main Ethereum Network) and use multiple Terabytes of storage. If you are sure to never need the extra data provided by an archive node, you can go ahead and start the node with normal state pruning, no traces and without the fat-db option. Please note that it is not possible to retroactively switch to an archive node from a normal full node, so it is important to evaluate prior to the synchronization what your needs are (and what they are going to be).
 
+Below is a screenshot of OpenEthereum running in a terminal window. Marked in red is the location of the database (and as such the location of the IPC file), and the options chosen for the node. 
+
+![Terminal window showing OpenEthereum running](/images/terminal_openeth.png)
+
 #### 1.2.2 Starting the Synchronization process
-For the purpose of this proof-of-concept, only a small part of the Ethereum blockchain was synchronized. The same concepts can be applied to a much larger data set. Also note that the archive node in this specific case, is mostly used for future proofing the node. For the time being, all data used can also be obtained using a full node.
+For the purpose of this proof of concept, only a small part of the Ethereum blockchain was synchronized. The same concepts can be applied to a much larger data set. Also note that the archive node in this specific case, is mostly used for future proofing the node. For the time being, all data used can also be obtained using a full node.
 
 The command used in testing to start synchronizing with the main Ethereum Network is the following:
 
