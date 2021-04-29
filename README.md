@@ -174,6 +174,6 @@ SELECT date, ROUND(AVG(tx_count), 2) AS average
  GROUP BY date;
 ```
 
-Copying the results of the query into a spreadsheet, and plotting them gives us the graph shown in the image below. The results here are based on a reduced data set spanning the first nine month after the lunch of the Ethereum network. 
+Copying the results of the query into a spreadsheet, and plotting them gives us the graph shown in the image below. The results here are based on a reduced data set spanning the first nine months after the lunch of the Ethereum network. 
 
 ![Result of example Query](/images/results_query_tx_per_block.png)
