@@ -111,7 +111,7 @@ python3 etl_postgres.py
 ```
 
 The script will start by asking if you want to create a `database.ini` file. If you did already in the last step, just type 'n' and ENTER, else type 'y' and answer follow the displayed instructions. Once a 'database.ini' file has been created (or once you have pressed 'n') you will be asked which tables you want to create: 
-```bash
+```text
 1. Table for Ethereum ETL
 2. Star Schema
 3. ETL Tables
@@ -136,28 +136,38 @@ Make sure you have installed Ethereum ETL. If you have not, please go through [s
 If you wish to manually run Ethereum ETL, make sure that you have the correct schema set up. You can run the sql statements specified [here](01_extraction_tables.sql) on your database, which will create two tables: transactions and blocks. Then you can run the following command, which will start extracting data from the node, transforming it and loading it into the tables of the database:
 
 ```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://[user]:[password]@[IP_Address]:[Port]/[database_name]```
-On MacOS the path to the .ipc file will be different, but the rest of the command should stay the same.
+
+On MacOS the path to the ipc file will be different, but the rest of the command should stay the same.
 
 In our specific case the database is running locally on the default port, it is called 'ethereum' and belongs to the user 'postgres' with the password 'postgres'. This is the command used:
 
 ```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://postgres:postgres@127.0.0.1:5432/ethereum -e transaction,block```
 
-The above command tells Ethereum ETL to use the data provided by our local OpenEthereum node, to start syncing from block 0 and to load that data into the PostgreSQL database running on localhost on port 5432. By default, blocks, transactions, logs and token transfers are extracted, transformed and loaded. By using the `-e` flag followed by any combination of entity names, one can extract only the data needed. As of now, only blocks, transactions, traces, token transfers, receipts and logs can be streamed using the stream command. Contract and Token data can only be obtained in a CSV format for now.
+The above command tells Ethereum ETL to use the data provided by our local OpenEthereum node, to start syncing from block 0 and to load that data into the PostgreSQL database running on localhost on port 5432. By default, blocks, transactions, logs and token transfers are extracted, transformed and loaded. By using the `-e` flag followed by any combination of entities, one can extract only the data needed. As of now, only blocks, transactions, traces, token transfers, receipts and logs can be streamed using the stream command. Contract and token data can only be obtained in a CSV format for now.
 
-If the command is stopped before finishing or once it has finished, a file called `last_synced_block.txt` is created in the current directory. This will be used in the case where the stream command is run again without providing the `--start-block` flag. There are further options that can be specified for this command which can be found [here](https://github.com/blockchain-etl/ethereum-etl/blob/develop/docs/commands.md#stream).
+If the command is stopped before finishing, or once it has finished, a file called `last_synced_block.txt` is created in the current directory. This will be used in the case where the stream command is run again without providing the `--start-block` flag. There are further options that can be specified for this command which can be found [here](https://github.com/blockchain-etl/ethereum-etl/blob/develop/docs/commands.md#stream).
 
 ### 3.2 Creating the Extraction Schema
 Ethereum ETL needs a specific Database Schema to work properly. By running the `CREATE TABLE` statements specified in [01_extraction_tables.sql](/sql_scripts/01_extraction_tables.sql) in a postgreSQL database, the correct schema for the ETL process will be set up.
 
 ### 3.3 Star Schema
-- Script for [Star schema](/sql_scripts/02_star_schema.sql)
-- Script for [ETL](/sql_scripts/03_etl.sql)
+Before starting the ETL process, the star schema must be created. To do this, we have to run [02_star_schema.sql](/sql_scripts/02_star_schema.sql). This will set up the star schema as shown in the image below. 
 
 ![Star schema](/images/star_schema.png)
 
+### 3.4 ETL Process
+The final step consists of extracting the data from the extraction schema, carrying out transformations of the data and loading the data into the final star schema. All required SQL statements are specified in [03_etl.sql](/sql_scripts/03_etl.sql). 
+
 ## 4 Querying Data
-[Queries](/sql_scripts/queries.sql)
+Now the data should be in the star schema, and queries can be carried out. Some example queries are provided in [queries.sql](/sql_scripts/queries.sql). Running the below query for example, gives us a daily average of the number of transactions per block. The results here are based on a reduced data set spanning the first ten month after the lunch of the Ethereum network.  
 
-Result of a test query on a small data set:
+```sql
+SELECT date, ROUND(AVG(tx_count), 2) AS average
+  FROM (
+           SELECT date, COUNT(*) AS tx_count
+             from f_blockchain
+            GROUP BY date, block_id) AS sub
+ GROUP BY date;
+```
 
-![Result of test Query](/images/results_query_weekday.png)
+![Result of example Query](/images/results_query_tx_per_block.png)
