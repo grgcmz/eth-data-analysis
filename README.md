@@ -1,5 +1,5 @@
 # ETH Data Analysis
-Python scripts to set up a multidimensional model for Ethereuem data analysis.
+Python scripts for a multidimensional model and ETL process for Ethereuem data analysis.
 
 ## General Information
 This is a step-by-step guide on how to
