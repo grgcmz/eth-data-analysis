@@ -1,5 +1,5 @@
 # ETH Data Analysis
-Python scripts to set up a multidimensional model and carry out an ETL process for Ethereuem data analysis.
+Python scripts to set up a multidimensional model and run an ETL process for Ethereum data analysis.
 
 ## General Information
 This is a step-by-step guide on how to
@@ -16,12 +16,12 @@ Listed below are the Technical Details of the Machine this was tested on:
 -   Ubuntu 20.04
 
 ## 0 Dependencies
-Please first of all install the below listed dependencies with your distribution's package manager, otherwise you might run into errors.
+First, please install the below listed dependencies with your distribution's package manager, otherwise you might run into errors.
 ``` bash
 python3-dev libpq-dev
 ```
 
-Then also pip install psycopg2 with the following command:
+Then, also pip install psycopg2 with the following command:
 ``` bash
 pip3 install psycopg2
 ```
@@ -126,7 +126,7 @@ Choose number 2 to create the star schema and then number 3 to extract, transfor
 
 **NB*: if you were to choose option 1 or 4 now, you would truncate the transactions and blocks table and thus loose the data you have extracted in the last step...
 
-Now everything will be set up and you can start querying the data.
+Now everything will be set up, and you can start querying the data.
 
 ### 2.4 Updating the Database
 In order to update the database, you must run Ethereum ETL again, redo the transformations and load the data into the database. For this, make sure that there is an OpenEthereum node running. Then, run `eth_etl_wrapper.py` again as explained [here](https://github.com/grgcmz/eth-data-analysis/blob/main/README.md#22-streaming-data-to-postgresql). When prompted to choose what to do, choose option 1 and then option 5 to commit the changes. 
@@ -141,7 +141,7 @@ If you wish to manually run Ethereum ETL, make sure that you have the correct sc
 
 ```ethereumetl stream --provider-uri file://$HOME/.local/share/openethereum/jsonrpc.ipc --start-block 0 --output postgresql+pg8000://[user]:[password]@[IP_Address]:[Port]/[database_name]```
 
-On MacOS the path to the ipc file will be different, but the rest of the command should stay the same.
+On macOS the path to the ipc file will be different, but the rest of the command should stay the same.
 
 In our specific case the database is running locally on the default port, it is called 'ethereum' and belongs to the user 'postgres' with the password 'postgres'. This is the command used:
 
