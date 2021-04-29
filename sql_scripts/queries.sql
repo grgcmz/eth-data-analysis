@@ -95,3 +95,7 @@ SELECT range, COUNT(*) AS amount
                  GROUP BY account_from_address, account_to_address) AS sub) as sub2
  GROUP BY range
  ORDER BY amount DESC;
+
+select * from etl.public.f_blockchain
+full outer join d_block db on f_blockchain.block_id = db.block_id
+order by db.number ASC;
