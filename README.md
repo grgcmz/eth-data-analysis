@@ -13,7 +13,7 @@ Listed below are the Technical Details of the Machine this was tested on:
 -   AMD Ryzen 7 PRO 4750U
 -   32GB DDR4 RAM
 -   1000GB NVMe SSD
--   Pop!_OS 20.10 with Kernel 5.8.0-7630-generic
+-   Ubuntu 20.04
 
 ## 0 Dependencies
 Please first of all install the below listed dependencies with your distribution's package manager, otherwise you might run into errors.
