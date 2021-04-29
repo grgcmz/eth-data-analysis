@@ -28,8 +28,7 @@ pip3 install psycopg2
 
 ## 1 Setting up an Archive Node
 ### 1.1 Installing OpenEthereum
-
-OpenEthereum can be installed by downloading the binaries provided in the [Releases Section](https://github.com/openethereum/openethereum/releases) of their repository. The binaries are available for Mac, Windows and Linux. There is also the possibility to download and run it as a Docker Image. For this project, OpenEthereum v3.2.1 was used. For further information about the installation process, please visit the OpenEthereum [Github Repository](https://github.com/openethereum/openethereum) or [read the documentation.](https://openethereum.github.io/).
+The Ethereum client OpenEthereum must also be installed. Binaries are provided in the [releases section](https://github.com/openethereum/openethereum/releases) of the project's repository on GitHub. They are available for Mac, Windows and Linux. There is also the possibility to download and run the program as a Docker image. For this project, OpenEthereum v3.2.1 was used. For further information about the installation process, please visit the OpenEthereum [github repository](https://github.com/openethereum/openethereum) or read OpenEthereum's [read the documentation.](https://openethereum.github.io/)..
 
 **NB:** Make all binaries executable and move them to `/usr/local/bin/` in order to be able to call OpenEthereum from anywhere. 
 
