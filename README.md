@@ -163,7 +163,7 @@ Before starting the ETL process, the star schema must be created. To do this, we
 The final step consists of extracting the data from the extraction schema, carrying out transformations of the data and loading the data into the final star schema. All required SQL statements are specified in [03_etl.sql](/sql_scripts/03_etl.sql). 
 
 ## 4 Querying Data
-Now the data should be in the star schema, and queries can be carried out. Some example queries are provided in [queries.sql](/sql_scripts/queries.sql). Running the below query for example, gives us a daily average of the number of transactions per block. The results here are based on a reduced data set spanning the first ten month after the lunch of the Ethereum network.  
+Now the data should be in the star schema, and queries can be carried out. Some example queries are provided in [queries.sql](/sql_scripts/queries.sql). Running the below query for example, gives us a daily average of the number of transactions per block.
 
 ```sql
 SELECT date, ROUND(AVG(tx_count), 2) AS average
@@ -173,5 +173,7 @@ SELECT date, ROUND(AVG(tx_count), 2) AS average
             GROUP BY date, block_id) AS sub
  GROUP BY date;
 ```
+
+Copying the results of the query into a spreadsheet, and plotting them gives us the graph shown in the image below. The results here are based on a reduced data set spanning the first ten month after the lunch of the Ethereum network. 
 
 ![Result of example Query](/images/results_query_tx_per_block.png)
