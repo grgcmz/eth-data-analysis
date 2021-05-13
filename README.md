@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/330162234.svg)](https://zenodo.org/badge/latestdoi/330162234)
 # ETH Data Analysis
 Python scripts to set up a multidimensional model and run an ETL process for Ethereum data analysis.
 
