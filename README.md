@@ -29,6 +29,7 @@ sudo apt install python3-dev libpq-dev
 sudo dnf install python3-devel postgresql-libs
 ```
 **Always**
+
 Then, also pip install psycopg2 with the following command:
 ``` bash
 pip3 install psycopg2
