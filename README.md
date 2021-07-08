@@ -18,10 +18,16 @@ Listed below are the Technical Details of the Machine this was tested on:
 
 ## 0 Dependencies
 First, please install the below listed dependencies with your distribution's package manager, otherwise you might run into errors.
+
+### Ubuntu based distributions
 ``` bash
-python3-dev libpq-dev
+sudo apt install python3-dev libpq-dev
 ```
 
+### Fedora
+``` bash
+sudo dnf install python3-devel postgresql-libs
+```
 Then, also pip install psycopg2 with the following command:
 ``` bash
 pip3 install psycopg2
