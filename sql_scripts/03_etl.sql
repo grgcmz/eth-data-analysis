@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 /*  ETL
     Prerequisites:
         - Transactions and blocks table have been populated with
@@ -144,6 +146,8 @@ CREATE TABLE IF NOT EXISTS t_d_transaction (
     gas                         BIGINT,
     gas_price                   BIGINT,
     input                       TEXT,
+    method_id                   TEXT,
+    method_parameters           TEXT,
     receipt_cumulative_gas_used BIGINT,
     receipt_gas_used            BIGINT,
     receipt_contract_address    TEXT,
@@ -165,6 +169,8 @@ INSERT INTO t_d_transaction (hash,
                              gas,
                              gas_price,
                              input,
+                             method_id,
+                             method_parameters,
                              receipt_cumulative_gas_used,
                              receipt_gas_used,
                              receipt_contract_address,
@@ -181,11 +187,17 @@ SELECT hash,
            WHEN to_address IS NULL
                THEN '0x0000000000000000000000000000000000000000' --avoid problems in fact table
            ELSE to_address
-           END,
+       END,
        value,
        gas,
        gas_price,
        input,
+       substring(input, 1, 10)
+       CASE
+           WHEN input IS NULL
+               THEN NULL
+           ELSE substring(input, 11)
+       END,
        receipt_cumulative_gas_used,
        receipt_gas_used,
        receipt_contract_address,
@@ -397,6 +409,8 @@ INSERT INTO d_transaction(transaction_id,
                           gas,
                           gas_price,
                           input,
+                          method_id,
+                          method_parameters,
                           receipt_cumulative_gas_used,
                           receipt_gas_used,
                           receipt_contract_address,
@@ -415,6 +429,8 @@ SELECT transaction_id,
        gas,
        gas_price,
        input,
+       method_id,
+       method_parameters,
        receipt_cumulative_gas_used,
        receipt_gas_used,
        receipt_contract_address,

@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS d_transaction (
     gas                         BIGINT,
     gas_price                   BIGINT,
     input                       TEXT,
+    method_id                   TEXT,
+    method_parameters           TEXT,
     receipt_cumulative_gas_used BIGINT,
     receipt_gas_used            BIGINT,
     receipt_contract_address    TEXT,
