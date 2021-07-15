@@ -192,7 +192,7 @@ SELECT hash,
        gas,
        gas_price,
        input,
-       substring(input, 1, 10)
+       substring(input, 1, 10),
        CASE
            WHEN input IS NULL
                THEN NULL
