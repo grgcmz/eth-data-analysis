@@ -47,3 +47,18 @@ CREATE TABLE IF NOT EXISTS blocks (
 );
 
 TRUNCATE TABLE blocks;
+
+CREATE TABLE IF NOT EXISTS token_transfers (
+    token_address               TEXT,
+    from_address                TEXT,
+    to_address                  TEXT,
+    value                       NUMERIC(88),
+    transaction_hash            TEXT,
+    log_index                   BIGINT,
+    block_timestamp             TIMESTAMP,
+    block_number                BIGINT,
+    block_hash                  TEXT,
+    PRIMARY KEY (transaction_hash, log_index)
+);
+
+TRUNCATE TABLE token_transfers;
