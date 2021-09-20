@@ -19,6 +19,7 @@ def setup_for_extraction(cur):
         choose()
 
 
+
 # Setup final star schema
 def setup_star_schema(cur):
     try:
@@ -33,14 +34,112 @@ def setup_star_schema(cur):
 
 # setup all extraction, transformation and loading tables
 def setup_etl_schema(cur):
-    try:
-        print("\nSetting up tables for ETL Process")
-        cur.execute(open("sql_scripts/03_etl.sql", "r").read())
-        print("done")
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        choose()
+    print(
+        "Choose the start block for the ETL process:\n"
+        "(DEFAULT: first until last block)\n"
+    )
+    print("\n")
+    number_from = int(
+        input("block number from = ")
+    )
+    number_to = int(
+        input("\nblock number to = ")
+    )
+    if number_to == "" and number_from == "":
+        try:
+            print("\nSetting up tables for ETL Process")
+            cur.execute(open("sql_scripts/03_etl.sql", "r").read())
+            print("done")
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            choose()
+    else:
+        try:
+            cur.execute(open("sql_scripts/04_extraction_tables.sql", "r").read())
+            cur.execute('''INSERT INTO e_d_transaction (hash,
+                                         nonce,
+                                         transaction_index,
+                                         from_address,
+                                         to_address,
+                                         value,
+                                         gas,
+                                         gas_price,
+                                         input,
+                                         receipt_cumulative_gas_used,
+                                         receipt_gas_used,
+                                         receipt_contract_address,
+                                         receipt_root,
+                                         receipt_status,
+                                         block_timestamp,
+                                         block_number,
+                                         block_hash)
+
+                            SELECT hash,
+                                    nonce,
+                                    transaction_index,
+                                    from_address,
+                                    to_address,
+                                    value,
+                                    gas,
+                                    gas_price,
+                                    input,
+                                    receipt_cumulative_gas_used,
+                                    receipt_gas_used,
+                                    receipt_contract_address,
+                                    receipt_root,
+                                    receipt_status,
+                                    block_timestamp,
+                                    block_number,
+                                    block_hash
+                            FROM transactions
+                            WHERE block_number >= %s and block_number <= %s;''', (number_from, number_to)
+            )
+            cur.execute('''INSERT INTO e_d_block (number,
+                                   hash,
+                                   parent_hash,
+                                   nonce,
+                                   sha3_uncles,
+                                   logs_bloom,
+                                   transactions_root,
+                                   state_root,
+                                   receipts_root,
+                                   miner,
+                                   difficulty,
+                                   total_difficulty,
+                                   size,
+                                   extra_data,
+                                   gas_limit,
+                                   gas_used,
+                                   timestamp,
+                                   transaction_count)
+                            SELECT number,
+                                    hash,
+                                    parent_hash,
+                                    nonce,
+                                    sha3_uncles,
+                                    logs_bloom,
+                                    transactions_root,
+                                    state_root,
+                                    receipts_root,
+                                    miner,
+                                    difficulty,
+                                    total_difficulty,
+                                    size,
+                                    extra_data,
+                                    gas_limit,
+                                    gas_used,
+                                    timestamp,
+                                    transaction_count
+                            FROM blocks
+                            WHERE number >= %s and number <= %s;''',
+              (number_from, number_to))
+            cur.execute(open("sql_scripts/05_etl_restricted.sql", "r").read())
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            print(error)
+        finally:
+            choose()
 
 
 # Setup all tables
