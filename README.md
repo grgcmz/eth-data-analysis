@@ -21,7 +21,7 @@ First, please install the below listed dependencies with your distribution's pac
 
 **Ubuntu**
 ``` bash
-sudo apt install python3-dev libpq-dev
+sudo apt install python3-dev libpq-dev postgresql
 ```
 
 **Fedora**
@@ -32,7 +32,7 @@ sudo dnf install python3-devel postgresql-libs
 
 Then, also pip install psycopg2 with the following command:
 ``` bash
-pip3 install psycopg2
+pip3 install psycopg2 pyetherchain mythril sqlalchemy pg8000 ethereum-etl ethereum-etl[streaming]
 ```
 
 ## 1 Setting up an Archive Node
