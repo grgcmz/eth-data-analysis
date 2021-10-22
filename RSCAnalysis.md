@@ -177,7 +177,7 @@ Result:
 - Transaction 0xf08ced33fe23772836d3f7b8b69b067e2aae9b874ac6e000a413130ca8b5a1f3
 - Method 0x38ed1739 of the uniswap exchange smart contract
   - Refers to swapExactTokensForTokens(uint256 amountIn, uint256 amountOutMin, address[] path, address to, uint256 deadline)
-- Parameters: When decoding the parameters, the handling of datatypes and arrays in the EVM/Solidity needs to be taken into account. The array parameter with an a priori unknown number of entries is given last. Possibly use tools suggested by Giorgio: https://github.com/ConsenSys/abi-decoder and ethereum-input-data-decoder: https://github.com/miguelmota/ethereum-input-data-decoder and 4byte at https://www.4byte.directory/ .
+- Parameters: When decoding the parameters, the handling of datatypes and arrays in the EVM/Solidity needs to be taken into account. The array parameter with an a priori unknown number of entries is given last.
 
   1. amountIn: a2a15d09519be00000
   2. amountOutMin: 03142f69
