@@ -159,8 +159,7 @@ Secondly, the account holder sends a transaction to the exchange smart contract,
 > Retrieve token exchange transactions from the account holder to the exchange after block 12694950
 
 ```
-select  hash, block, 
-		substr(method_id,1,64) as method, substr(method_parameters,1) as parameters
+select  hash, substr(method_id,1,64) as method, substr(method_parameters,1) as parameters
 from 	f_blockchain fb 
 		inner join d_transaction dt on fb.transaction_id = dt.transaction_id 
 where 	from_address = '0xbde541cb55047b09daf92ea29837a184b5103d6a' and
