@@ -188,4 +188,5 @@ Copying the results of the query into a spreadsheet, and plotting them gives us 
 ![Result of example Query](/images/results_query_tx_per_block.png)
 
 ## 5 Video Presentation
+Click on the image below to view a video presentation of our paper, including some example queries on YouTube.
 [![Video Presentation](https://img.youtube.com/vi/Vy_13VGO56Q/0.jpg)](https://www.youtube.com/watch?v=Vy_13VGO56Q)
